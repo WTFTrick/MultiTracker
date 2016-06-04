@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">MultiTracker</string>
+    <string name="action_clear">Clear all data</string>
+    <string name="action_exit">Exit</string>
+</resources>
