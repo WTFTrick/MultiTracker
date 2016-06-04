@@ -2,6 +2,7 @@ package app.multitracker;
 
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
@@ -27,18 +28,14 @@ import org.osmdroid.views.MapView;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Random;
 
 public class MultiTracker extends AppCompatActivity {
 
     private MapView osm;
     private MapController mc;
-
     ArrayList<GeoPoint> geoPointsArray = new ArrayList<GeoPoint>();
-    ArrayList<GeoPoint> arr_route1 = new ArrayList<GeoPoint>();
-    ArrayList<GeoPoint> arr_route2 = new ArrayList<GeoPoint>();
     ArrayList<Polyline> polylineArray = new ArrayList<Polyline>();
-
-
     ArrayList<String> keyslist = new ArrayList<String>();
     ArrayList<Marker> markersArray = new ArrayList<Marker>();
     ArrayList<ArrayList<GeoPoint>> arrayOfGeoPoints = new ArrayList<ArrayList<GeoPoint>>();
@@ -140,9 +137,7 @@ public class MultiTracker extends AppCompatActivity {
                 }
 
             });
-        }
-        else
-        {
+        } else {
             System.out.println("No internet connection");
         }
     }
@@ -150,8 +145,8 @@ public class MultiTracker extends AppCompatActivity {
     public void createMarker(GeoPoint GP, int index)
     {
         marker = new Marker(osm);
+        marker.setIcon(getResources().getDrawable(R.drawable.locmarker));
         marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-        marker.setIcon(getResources().getDrawable(R.drawable.marker));
         marker.setEnabled(true);
         osm.getOverlays().add(marker);
         marker.setPosition(GP);
@@ -160,8 +155,7 @@ public class MultiTracker extends AppCompatActivity {
         markersArray.add(index, marker);
     }
 
-    public void createPolyline(GeoPoint GP, int index)
-    {
+    public void createPolyline(GeoPoint GP, int index) {
         geoPoints = new ArrayList<GeoPoint>();
         geoPoints.add(GP);
         roadManager = new OSRMRoadManager();
@@ -173,8 +167,7 @@ public class MultiTracker extends AppCompatActivity {
         osm.invalidate();
     }
 
-    public void DrawPolyline(GeoPoint GP, int index)
-    {
+    public void DrawPolyline(GeoPoint GP, int index) {
         arrayOfGeoPoints.get(index).add(GP);
         polylineArray.get(index).setPoints(arrayOfGeoPoints.get(index));
         osm.getOverlays().add(polylineArray.get(index));
@@ -204,12 +197,12 @@ public class MultiTracker extends AppCompatActivity {
             }
             case R.id.action_clear: {
                 ref.setValue(null);
+                osm.getOverlays().clear();
 
                     /*geoPointsArray.clear();
                     keyslist.clear();
                     arr_route1.clear();
-                    arr_route2.clear();
-                    osm.getOverlays().clear();*/
+                    arr_route2.clear();*/
 
                 osm.invalidate();
                 return true;
