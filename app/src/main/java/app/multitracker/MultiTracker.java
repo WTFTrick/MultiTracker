@@ -1,9 +1,13 @@
+/**
+ * Class of main activity
+ * @author NickKopylov
+ * @version 1.0
+ */
+
 package app.multitracker;
 
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -25,19 +29,28 @@ import org.osmdroid.views.MapView;
 import java.util.ArrayList;
 import java.util.Map;
 
-
 public class MultiTracker extends AppCompatActivity {
 
-    private static MapView osm;
+    /** A mapView of main activity */
+    private MapView osm;
+    /** A tool for work with MapView */
     private MapController mc;
+    /** An array list, contain polylines */
     private ArrayList<Polyline> polylineArray = new ArrayList<Polyline>();
+    /** An array list, contain keys of child of Firebase */
     private ArrayList<String> keyslist = new ArrayList<String>();
-    private static ArrayList<Marker> markersArray = new ArrayList<Marker>();
-    private static ArrayList< ArrayList<GeoPoint> > arrayOfGeoPoints = new ArrayList<ArrayList<GeoPoint>>();
+    /** An array list, contain markers */
+    private ArrayList<Marker> markersArray = new ArrayList<Marker>();
+    /** An array list, contain array list, which contain geo points */
+    private ArrayList< ArrayList<GeoPoint> > arrayOfGeoPoints = new ArrayList<ArrayList<GeoPoint>>();
+    /** An object of class Firebase ref */
     private Firebase ref;
-    private static RoadManager roadManager;
-    private static Road road;
-    private static int polylineColor = Color.parseColor("#2E7D32");
+    /** An object of class RoadManager for work with OSM roads */
+    private RoadManager roadManager;
+    /** An object of class Road */
+    private Road road;
+    /** A var, contain color of the polyline */
+    private int polylineColor = Color.parseColor("#2E7D32");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,28 +67,13 @@ public class MultiTracker extends AppCompatActivity {
         osm.setMinZoomLevel(3);
         osm.setMaxZoomLevel(18);
         mc.setZoom(18);
-
         osm.invalidate();
 
         getDataFromFirebase();
-
-        ConnectivityManager cm =
-                (ConnectivityManager) getSystemService(MultiTracker.CONNECTIVITY_SERVICE);
-
-        NetworkInfo i = cm.getActiveNetworkInfo();
-
-        /*if ((i.isConnected()) && (i.isAvailable()))
-        {
-            System.out.println("Internet connection success");
-        }
-        else
-        {
-            System.out.println("No internet connection");
-            Toast.makeText(getApplicationContext(), "No internet connection", Toast.LENGTH_SHORT).show();
-        }*/
-
     }
 
+    /** A function, include ChildEventListener, listen a Firebase for new connections
+     * and change the data */
     public void getDataFromFirebase()
     {
         ref = new Firebase("https://locmanager.firebaseio.com/");
@@ -85,8 +83,8 @@ public class MultiTracker extends AppCompatActivity {
             public void onChildAdded(DataSnapshot snapshot, String previousChildKey) {
 
                 Map<String, Double> newPost = (Map<String, Double>) snapshot.getValue();
-                System.out.println("Latitude add: " + newPost.get("Latitude"));
-                System.out.println("Longitude add: " + newPost.get("Longitude"));
+                //System.out.println("Latitude add: " + newPost.get("Latitude"));
+                //System.out.println("Longitude add: " + newPost.get("Longitude"));
                 Double lat = (Double) snapshot.child("Latitude").getValue();
                 Double lon = (Double) snapshot.child("Longitude").getValue();
                 Toast.makeText(getApplicationContext(), "Lat: \n" + lat + "\nLon: \n" + lon, Toast.LENGTH_LONG).show();
@@ -95,7 +93,7 @@ public class MultiTracker extends AppCompatActivity {
                 GeoPoint GP = new GeoPoint(lat, lon);
 
                 keyslist.add(Key);
-                System.out.println("IdKey: " + Key);
+                //System.out.println("IdKey: " + Key);
 
                 createMarker(GP, keyslist.indexOf(Key));
                 createPolyline(GP, keyslist.indexOf(Key));
@@ -116,8 +114,8 @@ public class MultiTracker extends AppCompatActivity {
                 changeMarkerPosition(GP, keyslist.indexOf(Key));
                 DrawPolyline(GP, keyslist.indexOf(Key));
 
-                System.out.println("IdKey when changed: " + Key);
-                System.out.println("IdKey from array of Keys: " + keyslist.indexOf(Key));
+                //System.out.println("IdKey when changed: " + Key);
+                //System.out.println("IdKey from array of Keys: " + keyslist.indexOf(Key));
 
                 osm.invalidate();
             }
@@ -140,6 +138,9 @@ public class MultiTracker extends AppCompatActivity {
         });
     }
 
+    /** A function, create marker on MapView
+     * @param GP contain pair of latitude and longitude
+     * @param index contain index of marker */
     public void createMarker(GeoPoint GP, int index)
     {
         Marker marker = new Marker(osm);
@@ -153,13 +154,18 @@ public class MultiTracker extends AppCompatActivity {
 
         markersArray.add(index, marker);
     }
-
+    /** A function, change marker position on MapView
+     * @param GP contain new pair of latitude and longitude
+     * @param index contain index of marker */
     public void changeMarkerPosition(GeoPoint GP, int index) {
         System.out.println("Index from array: " + index);
         markersArray.get(index).setPosition(GP);
         osm.invalidate();
     }
 
+    /** A function, create polyline on MapView
+     * @param GP contain pair of latitude and longitude
+     * @param index contain index of polyline */
     public void createPolyline(GeoPoint GP, int index) {
         ArrayList<GeoPoint> geoPoints = new ArrayList<GeoPoint>();
         geoPoints.add(GP);
@@ -172,6 +178,9 @@ public class MultiTracker extends AppCompatActivity {
         osm.invalidate();
     }
 
+    /** A fucntion, draws polyline on MapView
+     * @param GP contain new pair of latitude and longitude
+     * @param index contain index of polyline */
     public void DrawPolyline(GeoPoint GP, int index) {
         arrayOfGeoPoints.get(index).add(GP);
         polylineArray.get(index).setPoints(arrayOfGeoPoints.get(index));
@@ -205,6 +214,7 @@ public class MultiTracker extends AppCompatActivity {
         }
     }
 
+    /** A quit function */
     private void quit() {
         System.gc();
         int pid = android.os.Process.myPid();

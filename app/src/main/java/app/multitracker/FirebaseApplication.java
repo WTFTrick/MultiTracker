@@ -1,3 +1,8 @@
+/**
+ * Class FirebaseApplication for setting Android Context
+ * @author NickKopylov
+ * @version 1.0
+ */
 package app.multitracker;
 
 import com.firebase.client.Firebase;
